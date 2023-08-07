@@ -148,3 +148,71 @@ const addRole = async () => {
   await start();
 };
 
+const addEmployee = async () => {
+    const answer = await inquirer.prompt([
+      {
+        name: 'first_name',
+        type: 'input',
+        message: 'What is the employee\'s first name?'
+      },
+      {
+        name: 'last_name',
+        type: 'input',
+        message: 'What is the employee\'s last name?'
+      },
+      {
+        name: 'role_id',
+        type: 'input',
+        message: 'What is the role id for the employee?'
+      },
+      {
+        name: 'manager_id',
+        type: 'input',
+        message: 'What is the manager id for the employee?'
+      }
+    ]);
+  
+    await db.query('INSERT INTO employee SET ?', {
+      first_name: answer.first_name,
+      last_name: answer.last_name,
+      role_id: answer.role_id,
+      manager_id: answer.manager_id
+    });
+  
+    console.log('Added new employee');
+    await start();
+  };
+  
+  const updateEmployeeRole = async () => {
+    const answer = await inquirer.prompt([
+      {
+        name: 'employee_id',
+        type: 'input',
+        message: 'What is the id of the employee to update?'
+      },
+      {
+        name: 'role_id',
+        type: 'input',
+        message: 'What is the new role id for the employee?'
+      }
+    ]);
+  
+    await db.query('UPDATE employee SET ? WHERE ?', [
+      {
+        role_id: answer.role_id
+      },
+      {
+        id: answer.employee_id
+      }
+    ]);
+  
+    console.log('Updated employee role');
+    await start();
+  };
+  
+  connectDb()
+    .then(() => {
+      console.log('Database connected!');
+      start();
+    })
+    .catch((err) => console.log(err));
