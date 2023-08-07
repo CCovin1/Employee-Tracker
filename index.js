@@ -88,3 +88,63 @@ const start = async () => {
   }
 };
 
+startApp();
+
+const viewDepartments = async () => {
+    const [rows] = await db.query('SELECT * FROM department');
+    console.table(rows);
+    await start();
+};
+
+const viewRoles = async () => {
+  const [rows] = await db.query(
+    `SELECT role.id, role.title, role.salary, department.name AS department 
+    FROM role 
+    LEFT JOIN department ON role.department_id = department.id`
+  );
+  console.table(rows);
+  await start();
+};
+
+const viewEmployees = async () => {
+  const [rows] = await db.query(
+    `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, 
+    CONCAT(manager.first_name, ' ', manager.last_name) AS manager 
+    FROM employee 
+    LEFT JOIN role ON employee.role_id = role.id 
+    LEFT JOIN department ON role.department_id = department.id 
+    LEFT JOIN employee manager ON manager.id = employee.manager_id`
+  );
+  console.table(rows);
+  await start();
+};
+
+const addRole = async () => {
+  const answer = await inquirer.prompt([
+    {
+      name: 'title',
+      type: 'input',
+      message: 'What is the role title?'
+    },
+    {
+      name: 'salary',
+      type: 'input',
+      message: 'What is the role salary?'
+    },
+    {
+      name: 'department_id',
+      type: 'input',
+      message: 'What is the department id for the role?'
+    }
+  ]);
+
+  await db.query('INSERT INTO role SET ?', {
+    title: answer.title,
+    salary: answer.salary,
+    department_id: answer.department_id
+  });
+
+  console.log('Added new role');
+  await start();
+};
+
